@@ -1,0 +1,21 @@
+package users_service
+
+import (
+	"context"
+	"fmt"
+)
+
+func (s *UsersService) DeleteUser(
+	ctx context.Context,
+	id int,
+
+) error {
+
+	err := s.userRepository.DeleteUser(ctx, id)
+
+	if err != nil {
+		return fmt.Errorf("delete user: %w", err)
+	}
+
+	return nil
+}
