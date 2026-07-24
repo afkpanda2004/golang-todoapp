@@ -3,7 +3,6 @@ export
 
 export PROJECT_ROOT=$(shell pwd)
 
-
 env-up:
 	@docker compose up -d todoapp-postgres
 
@@ -11,15 +10,15 @@ env-down:
 	@docker compose down todoapp-postgres	
 
 env-cleanup:
-	@read -p "Очистить все volume файлы окружения? Опасность утери данных. [y/N]: " ans; \
+	@echo -n "Очистить все volume файлы окружения? Опасность утери данных. [y/N]: "; \
+	read ans; \
 	if [ "$$ans" = "y" ]; then \
 		docker compose down todoapp-postgres port-forwarder && \
-		rm -rf out/pgdata && \
+		rm -rf ${PROJECT_ROOT}/out/pgdata && \
 		echo "Файлы окружения очищены"; \
 	else \
 		echo "Очистка окружения отменена"; \
 	fi
-
 
 env-port-forward:
 	@docker compose up -d port-forwarder
@@ -27,11 +26,9 @@ env-port-forward:
 env-port-close:
 	@docker compose down port-forwarder
 
-
-
 migrate-create:
 	@if [ -z "$(seq)" ]; then \
-		echo "Отсутствует необходимый параметр seq. Пример make migrate-create seq = init "; \
+		echo "Отсутствует необходимый параметр seq. Пример: make migrate-create seq=init"; \
 		exit 1; \
 	fi; \
 	docker compose run --rm todoapp-postgres-migrate \
@@ -48,7 +45,7 @@ migrate-down:
 
 migrate-action:
 	@if [ -z "$(action)" ]; then \
-		echo "Отсутствует необходимый параметр action. Пример make migrate-action action = up 666 "; \
+		echo "Отсутствует необходимый параметр action. Пример: make migrate-action action=up"; \
 		exit 1; \
 	fi; \
 	docker compose run --rm todoapp-postgres-migrate \
@@ -57,7 +54,8 @@ migrate-action:
 		"$(action)"
 
 todoapp-run:
+	@mkdir -p ${PROJECT_ROOT}/out/logs
 	@export LOGGER_FOLDER=${PROJECT_ROOT}/out/logs && \
 	export POSTGRES_HOST=localhost && \
 	go mod tidy && \
-	go run cmd/todoapp/main.go
+	go run ${PROJECT_ROOT}/cmd/todoapp/main.go
