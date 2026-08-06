@@ -55,7 +55,7 @@ func (r *UsersRepository) PatchUser(
 	if err != nil {
 		if errors.Is(err, core_postgres_pool.ErrorNoRows) {
 			return domain.User{}, fmt.Errorf(
-				"user witch id=%d concurrently accessed:%w",
+				"user with id=%d concurrently accessed:%w",
 				id,
 				core_errors.ErrConflict,
 			)

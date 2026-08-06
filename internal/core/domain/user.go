@@ -31,7 +31,7 @@ func NewUser(
 
 }
 
-func NewUserUnitialized(
+func NewUserUninitialized(
 	fullName string,
 	phoneNumber *string,
 
