@@ -6,11 +6,16 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
+	core_config "github.com/afkpanda2004/golang-todoapp/internal/core/config"
 	core_logger "github.com/afkpanda2004/golang-todoapp/internal/core/logger"
 	core_pgx_pool "github.com/afkpanda2004/golang-todoapp/internal/core/repository/postgres/pool/pgx"
 	core_http_middleware "github.com/afkpanda2004/golang-todoapp/internal/core/transport/http/middleware"
 	core_http_server "github.com/afkpanda2004/golang-todoapp/internal/core/transport/http/server"
+	tasks_postgres_repository "github.com/afkpanda2004/golang-todoapp/internal/features/tasks/repository/postgres"
+	task_service "github.com/afkpanda2004/golang-todoapp/internal/features/tasks/service"
+	tasks_transport_http "github.com/afkpanda2004/golang-todoapp/internal/features/tasks/transport/http"
 	users_postgres_repository "github.com/afkpanda2004/golang-todoapp/internal/features/users/repository/postgres"
 	users_service "github.com/afkpanda2004/golang-todoapp/internal/features/users/service"
 	users_transport_http "github.com/afkpanda2004/golang-todoapp/internal/features/users/transport/http"
@@ -18,6 +23,10 @@ import (
 )
 
 func main() {
+
+	cfg := core_config.NewConfigMust()
+
+	time.Local = cfg.TimeZone
 	ctx, cancel := signal.NotifyContext(
 		context.Background(),
 		syscall.SIGINT, syscall.SIGTERM,
@@ -32,6 +41,8 @@ func main() {
 	}
 
 	defer logger.Close()
+
+	logger.Debug("application time zone", zap.Any("zone", time.Local))
 
 	logger.Debug("initiazling postgres connection pool")
 
@@ -50,6 +61,11 @@ func main() {
 	userService := users_service.NewUsersService(usersRepository)
 	usersTransportHTTP := users_transport_http.NewUsersHTTPHandler(userService)
 
+	logger.Debug("initializing feature", zap.String("feature", "tasks"))
+	tasksRepository := tasks_postgres_repository.NewTaskRepository(pool)
+	taskService := task_service.NewTaskService(tasksRepository)
+	tasksTransportHTTP := tasks_transport_http.NewTasksHTTPHandler(taskService)
+
 	logger.Debug("initializing HTTP server")
 	httpServer := core_http_server.NewHTTPServer(
 		core_http_server.NewConfigMust(),
@@ -62,6 +78,7 @@ func main() {
 
 	apiVersionRouter := core_http_server.NewApiVersionRouter(core_http_server.ApiVersion1)
 	apiVersionRouter.RegisterRoutes(usersTransportHTTP.Routes()...)
+	apiVersionRouter.RegisterRoutes(tasksTransportHTTP.Routes()...)
 
 	httpServer.RegisterAPIRoutes(apiVersionRouter)
 
