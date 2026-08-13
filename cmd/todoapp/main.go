@@ -16,6 +16,9 @@ import (
 	tasks_postgres_repository "github.com/afkpanda2004/golang-todoapp/internal/features/tasks/repository/postgres"
 	task_service "github.com/afkpanda2004/golang-todoapp/internal/features/tasks/service"
 	tasks_transport_http "github.com/afkpanda2004/golang-todoapp/internal/features/tasks/transport/http"
+	statistics_postgres_repository "github.com/afkpanda2004/golang-todoapp/internal/features/statistics/repository/postgres"
+	statistics_service "github.com/afkpanda2004/golang-todoapp/internal/features/statistics/service"
+	statistics_transport_http "github.com/afkpanda2004/golang-todoapp/internal/features/statistics/transport/http"
 	users_postgres_repository "github.com/afkpanda2004/golang-todoapp/internal/features/users/repository/postgres"
 	users_service "github.com/afkpanda2004/golang-todoapp/internal/features/users/service"
 	users_transport_http "github.com/afkpanda2004/golang-todoapp/internal/features/users/transport/http"
@@ -66,6 +69,11 @@ func main() {
 	taskService := task_service.NewTaskService(tasksRepository)
 	tasksTransportHTTP := tasks_transport_http.NewTasksHTTPHandler(taskService)
 
+	logger.Debug("initializing feature", zap.String("feature", "statistics"))
+	statisticsRepository := statistics_postgres_repository.NewStatisticsRepository(pool)
+	statisticsService := statistics_service.NewStatisticsService(statisticsRepository)
+	statisticsTransportHTTP := statistics_transport_http.NewStatisticsHTTPHandler(statisticsService)
+
 	logger.Debug("initializing HTTP server")
 	httpServer := core_http_server.NewHTTPServer(
 		core_http_server.NewConfigMust(),
@@ -79,6 +87,7 @@ func main() {
 	apiVersionRouter := core_http_server.NewApiVersionRouter(core_http_server.ApiVersion1)
 	apiVersionRouter.RegisterRoutes(usersTransportHTTP.Routes()...)
 	apiVersionRouter.RegisterRoutes(tasksTransportHTTP.Routes()...)
+	apiVersionRouter.RegisterRoutes(statisticsTransportHTTP.Routes()...)
 
 	httpServer.RegisterAPIRoutes(apiVersionRouter)
 
