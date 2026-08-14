@@ -6,9 +6,12 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/afkpanda2004/golang-todoapp/docs"
 	core_logger "github.com/afkpanda2004/golang-todoapp/internal/core/logger"
 	core_http_middleware "github.com/afkpanda2004/golang-todoapp/internal/core/transport/http/middleware"
 	"go.uber.org/zap"
+
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 type HTTPServer struct {
@@ -41,6 +44,24 @@ func (s *HTTPServer) RegisterAPIRoutes(routes ...*APIVersionRouter) {
 			http.StripPrefix(prefix, router.WithMiddleware()),
 		)
 	}
+}
+
+func (s *HTTPServer) RegisterSwagger() {
+	s.mux.Handle(
+		"/swagger/",
+		httpSwagger.Handler(
+			httpSwagger.URL("/swagger/doc.json"),
+		),
+	)
+
+	s.mux.HandleFunc(
+		"/swagger/doc.json",
+		func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(docs.SwaggerInfo.ReadDoc()))
+		},
+	)
 }
 
 func (s *HTTPServer) Run(ctx context.Context) error {
