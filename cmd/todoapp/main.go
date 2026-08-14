@@ -13,16 +13,18 @@ import (
 	core_pgx_pool "github.com/afkpanda2004/golang-todoapp/internal/core/repository/postgres/pool/pgx"
 	core_http_middleware "github.com/afkpanda2004/golang-todoapp/internal/core/transport/http/middleware"
 	core_http_server "github.com/afkpanda2004/golang-todoapp/internal/core/transport/http/server"
-	tasks_postgres_repository "github.com/afkpanda2004/golang-todoapp/internal/features/tasks/repository/postgres"
-	task_service "github.com/afkpanda2004/golang-todoapp/internal/features/tasks/service"
-	tasks_transport_http "github.com/afkpanda2004/golang-todoapp/internal/features/tasks/transport/http"
 	statistics_postgres_repository "github.com/afkpanda2004/golang-todoapp/internal/features/statistics/repository/postgres"
 	statistics_service "github.com/afkpanda2004/golang-todoapp/internal/features/statistics/service"
 	statistics_transport_http "github.com/afkpanda2004/golang-todoapp/internal/features/statistics/transport/http"
+	tasks_postgres_repository "github.com/afkpanda2004/golang-todoapp/internal/features/tasks/repository/postgres"
+	task_service "github.com/afkpanda2004/golang-todoapp/internal/features/tasks/service"
+	tasks_transport_http "github.com/afkpanda2004/golang-todoapp/internal/features/tasks/transport/http"
 	users_postgres_repository "github.com/afkpanda2004/golang-todoapp/internal/features/users/repository/postgres"
 	users_service "github.com/afkpanda2004/golang-todoapp/internal/features/users/service"
 	users_transport_http "github.com/afkpanda2004/golang-todoapp/internal/features/users/transport/http"
 	"go.uber.org/zap"
+
+	_ "github.com/afkpanda2004/golang-todoapp/docs"
 )
 
 func main() {
@@ -90,6 +92,7 @@ func main() {
 	apiVersionRouter.RegisterRoutes(statisticsTransportHTTP.Routes()...)
 
 	httpServer.RegisterAPIRoutes(apiVersionRouter)
+	httpServer.RegisterSwagger()
 
 	if err := httpServer.Run(ctx); err != nil {
 		logger.Error("HTTP server run error", zap.Error(err))
