@@ -12,12 +12,24 @@ import (
 )
 
 type GetTaskStatisticsResponse struct {
-	TaskCreated           int      `json:"task_created"`
-	TaskCompleted         int      `json:"task_completed"`
-	TaskCompletionPercent *float64 `json:"task_completion_percent"`
-	TaskAvgCompletionTime *string  `json:"task_avg_completion_time_sec"`
+	TaskCreated           int      `json:"task_created"              example:"10"`
+	TaskCompleted         int      `json:"task_completed"            example:"7"`
+	TaskCompletionPercent *float64 `json:"task_completion_percent"   example:"70.0"`
+	TaskAvgCompletionTime *string  `json:"task_avg_completion_time_sec" example:"3600s"`
 }
 
+// GetStatistics godoc
+// @Summary      Получить статистику по задачам
+// @Description  Возвращает агрегированную статистику по задачам с опциональной фильтрацией
+// @Tags         statistics
+// @Produce      json
+// @Param        user_id  query int    false "Фильтр по ID пользователя"
+// @Param        from     query string false "Начало периода (RFC3339)" format(date-time)
+// @Param        to       query string false "Конец периода (RFC3339)" format(date-time)
+// @Success      200      {object}  GetTaskStatisticsResponse
+// @Failure      400      {object}  core_http_response.ErrorResponse "Bad request"
+// @Failure      500      {object}  core_http_response.ErrorResponse "Internal server error"
+// @Router       /statistics [get]
 func (h *StatisticsHTTPHandler) GetStatistics(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)

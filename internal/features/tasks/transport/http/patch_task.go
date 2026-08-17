@@ -12,9 +12,9 @@ import (
 )
 
 type PatchTaskRequest struct {
-	Title       core_http_types.Nullable[string] `json:"title"`
-	Description core_http_types.Nullable[string] `json:"description"`
-	Completed   core_http_types.Nullable[bool]   `json:"completed"`
+	Title       core_http_types.Nullable[string] `json:"title"        swaggertype:"string" example:"Купить молоко"`
+	Description core_http_types.Nullable[string] `json:"description"  swaggertype:"string" example:"2 литра"`
+	Completed   core_http_types.Nullable[bool]   `json:"completed"    swaggertype:"boolean" example:"true"`
 }
 
 func (r *PatchTaskRequest) Validate() error {
@@ -53,6 +53,20 @@ func (r *PatchTaskRequest) Validate() error {
 
 type PatchTaskResponse TaskDTOResponse
 
+// PatchTask godoc
+// @Summary      Обновить задачу
+// @Description  Частично обновляет данные задачи
+// @Tags         tasks
+// @Accept       json
+// @Produce      json
+// @Param        id       path  int              true  "ID задачи"
+// @Param        request  body  PatchTaskRequest true  "Поля для обновления"
+// @Success      200      {object}  PatchTaskResponse
+// @Failure      400      {object}  core_http_response.ErrorResponse "Bad request"
+// @Failure      404      {object}  core_http_response.ErrorResponse "Not found"
+// @Failure      409      {object}  core_http_response.ErrorResponse "Conflict"
+// @Failure      500      {object}  core_http_response.ErrorResponse "Internal server error"
+// @Router       /tasks/{id} [patch]
 func (h *TasksHTTPHandler) PatchTask(rw http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()

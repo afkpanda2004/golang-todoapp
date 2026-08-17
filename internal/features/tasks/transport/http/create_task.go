@@ -10,13 +10,25 @@ import (
 )
 
 type CreateTaskRequest struct {
-	Title        string  `json:"title" validate:"required,min=1,max=100"`
-	Description  *string `json:"description" validate:"omitempty,min=1,max=1000"`
-	AuthorUserID int     `json:"author_user_id" validate:"required"`
+	Title        string  `json:"title"          validate:"required,min=1,max=100"  example:"Купить молоко"`
+	Description  *string `json:"description"    validate:"omitempty,min=1,max=1000" example:"2 литра"`
+	AuthorUserID int     `json:"author_user_id" validate:"required"                  example:"1"`
 }
 
 type CreateTaskResponse TaskDTOResponse
 
+// CreateTask godoc
+// @Summary      Создать задачу
+// @Description  Создаёт новую задачу для пользователя
+// @Tags         tasks
+// @Accept       json
+// @Produce      json
+// @Param        request  body  CreateTaskRequest  true  "Данные новой задачи"
+// @Success      200      {object}  CreateTaskResponse
+// @Failure      400      {object}  core_http_response.ErrorResponse "Bad request"
+// @Failure      404      {object}  core_http_response.ErrorResponse "Not found"
+// @Failure      500      {object}  core_http_response.ErrorResponse "Internal server error"
+// @Router       /tasks [post]
 func (h *TasksHTTPHandler) CreateTask(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
