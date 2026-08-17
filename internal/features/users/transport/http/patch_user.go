@@ -13,8 +13,8 @@ import (
 )
 
 type PatchUserRequest struct {
-	FullName    core_http_types.Nullable[string] `json:"full_name"`
-	PhoneNumber core_http_types.Nullable[string] `json:"phone_number"`
+	FullName    core_http_types.Nullable[string] `json:"full_name"     swaggertype:"string" example:"Leonid Belyaev"`
+	PhoneNumber core_http_types.Nullable[string] `json:"phone_number"  swaggertype:"string" example:"+79118765657"`
 }
 
 func (r *PatchUserRequest) Validate() error {
@@ -49,6 +49,20 @@ func (r *PatchUserRequest) Validate() error {
 
 type PatchUserResponse UserDTOResponse
 
+// PatchUser godoc
+// @Summary      Обновить пользователя
+// @Description  Частично обновляет данные пользователя
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        id       path  int               true  "ID пользователя"
+// @Param        request  body  PatchUserRequest  true  "Поля для обновления"
+// @Success      200      {object}  PatchUserResponse
+// @Failure      400      {object}  core_http_response.ErrorResponse "Bad request"
+// @Failure      404      {object}  core_http_response.ErrorResponse "Not found"
+// @Failure      409      {object}  core_http_response.ErrorResponse "Conflict"
+// @Failure      500      {object}  core_http_response.ErrorResponse "Internal server error"
+// @Router       /users/{id} [patch]
 func (h *UserHTTPHandler) PatchUser(rw http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()

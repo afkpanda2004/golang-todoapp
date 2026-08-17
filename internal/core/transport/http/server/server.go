@@ -11,7 +11,7 @@ import (
 	core_http_middleware "github.com/afkpanda2004/golang-todoapp/internal/core/transport/http/middleware"
 	"go.uber.org/zap"
 
-	httpSwagger "github.com/swaggo/http-swagger"
+	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
 type HTTPServer struct {
@@ -51,6 +51,7 @@ func (s *HTTPServer) RegisterSwagger() {
 		"/swagger/",
 		httpSwagger.Handler(
 			httpSwagger.URL("/swagger/doc.json"),
+			httpSwagger.DefaultModelsExpandDepth(-1),
 		),
 	)
 
